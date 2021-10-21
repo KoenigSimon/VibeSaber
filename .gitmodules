@@ -1,0 +1,3 @@
+[submodule "lib/buttplug-rs-ffi"]
+	path = lib/buttplug-rs-ffi
+	url = https://gitlab.com/jacefax/buttplug-rs-ffi.git
