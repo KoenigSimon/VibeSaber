@@ -1,6 +1,4 @@
-﻿using IPA;
-using IPA.Config;
-using IPA.Config.Stores;
+﻿using IPA.Config.Stores;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,6 +6,8 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using IPALogger = IPA.Logging.Logger;
+using BS_Utils.Utilities;
+using IPA;
 
 namespace VibeSaber
 {
@@ -15,7 +15,8 @@ namespace VibeSaber
     public class Plugin
     {
         internal static Plugin Instance { get; private set; }
-        internal static IPALogger Log { get; private set; }
+
+        internal static ServerHandler serverInstance;
 
         [Init]
         /// <summary>
@@ -26,8 +27,11 @@ namespace VibeSaber
         public void Init(IPALogger logger)
         {
             Instance = this;
-            Log = logger;
-            Log.Info("VibeSaber initialized.");
+            Logger.log = logger;
+            Logger.log.Info("VibeSaber initialized.");
+
+            serverInstance = new ServerHandler();
+            serverInstance.InitializeServer();
         }
 
         #region BSIPA Config
@@ -45,16 +49,28 @@ namespace VibeSaber
         [OnStart]
         public void OnApplicationStart()
         {
-            Log.Debug("OnApplicationStart");
+            Logger.log.Debug("OnApplicationStart");
             new GameObject("VibeSaberController").AddComponent<VibeSaberController>();
 
+            BSEvents.gameSceneActive += GameSceneActive;
+        }
+
+        void GameSceneActive()
+        {
+            VibeSaberController.Instance.GetControllers();
+            Logger.log.Info("Controllers initialized");
         }
 
         [OnExit]
         public void OnApplicationQuit()
         {
-            Log.Debug("OnApplicationQuit");
-
+            Logger.log.Debug("OnApplicationQuit");
+            BSEvents.gameSceneActive -= GameSceneActive;
+            serverInstance.StopServer();
         }
+    }
+    internal static class Logger
+    {
+        internal static IPALogger log { get; set; }
     }
 }
