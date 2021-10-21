@@ -7,8 +7,6 @@ Featuring VibeSaber!
 
 What you need:
 - Modded Beatsaber
-- VibeSaber for the current version from this link:
-https://drive.google.com/drive/folders/1-MqlpBTpCewDEbpXjUgzPVZSZ9KXRTty?usp=sharing
 - BS_Utils Mod (from the Mod Manager)
 - A Lovense or any other Buttplug.io compatible device (only tested with lovense)
 - Intiface desktop App
