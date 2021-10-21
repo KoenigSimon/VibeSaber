@@ -68,7 +68,7 @@
     <ZipDir SourceDirectory="$(ArtifactDestination)" DestinationFile="$(DestinationDirectory)$(ArtifactName).zip" />
   </Target>
   <!--Copies the assembly and pdb to the Beat Saber folder.-->
-  <Target Name="CopyToPlugins" AfterTargets="Build" Condition="'$(DisableCopyToPlugins)' != 'True' AND '$(ContinuousIntegrationBuild)' != 'True'">
+  <Target Name="CopyToPlugins" AfterTargets="ILRepacker" Condition="'$(DisableCopyToPlugins)' != 'True' AND '$(ContinuousIntegrationBuild)' != 'True'">
     <PropertyGroup>
       <PluginDir>$(BeatSaberDir)\Plugins</PluginDir>
       <CanCopyToPlugins>True</CanCopyToPlugins>
@@ -93,4 +93,30 @@
     <Copy SourceFiles="$(OutputAssemblyName).pdb" DestinationFiles="$(PluginDir)\$(AssemblyName).pdb" Condition="'$(CanCopyToPlugins)' == 'True' AND Exists('$(OutputAssemblyName).pdb')"  />
     <Warning Text="Beat Saber is running, restart the game to use the latest build." Condition="'$(IsRunning)' == 'True'" />
   </Target>
+
+
+  <!--Buttplug Things-->
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\ILRepack.2.0.18\build\ILRepack.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\ILRepack.2.0.18\build\ILRepack.props'))" />
+    <Error Condition="!Exists('packages\ILRepack.Lib.MSBuild.Task.2.0.18.2\build\ILRepack.Lib.MSBuild.Task.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\ILRepack.Lib.MSBuild.Task.2.0.18.2\build\ILRepack.Lib.MSBuild.Task.targets'))" />
+  </Target>
+
+  <UsingTask AssemblyFile="packages\ILRepack.Lib.MSBuild.Task.2.0.18.2\build\ILRepack.Lib.MSBuild.Task.dll" TaskName="ILRepack" />
+  <Target Name="ILRepacker" AfterTargets="Build">
+    <ItemGroup>
+      <InputAssemblies Include="$(OutputPath)$(AssemblyName).dll" />
+      <InputAssemblies Include="packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll" />
+      <InputAssemblies Include="lib\buttplug-rs-ffi\csharp\ButtplugCSharpFFI\bin\$(Configuration)\net472\Buttplug.dll" />
+      <InputAssemblies Include="lib\buttplug-rs-ffi\csharp\ButtplugCSharpFFI\bin\$(Configuration)\net472\Google.Protobuf.dll" />
+      <InputAssemblies Include="lib\buttplug-rs-ffi\csharp\ButtplugCSharpFFI\bin\$(Configuration)\net472\System.Buffers.dll" />
+      <InputAssemblies Include="lib\buttplug-rs-ffi\csharp\ButtplugCSharpFFI\bin\$(Configuration)\net472\System.Memory.dll" />
+      <InputAssemblies Include="lib\buttplug-rs-ffi\csharp\ButtplugCSharpFFI\bin\$(Configuration)\net472\System.Numerics.Vectors.dll" />
+      <InputAssemblies Include="lib\buttplug-rs-ffi\csharp\ButtplugCSharpFFI\bin\$(Configuration)\net472\System.Runtime.CompilerServices.Unsafe.dll" />
+    </ItemGroup>
+    <ILRepack Parallel="true" InputAssemblies="@(InputAssemblies)" TargetKind="Dll" LibraryPath="lib\;lib\buttplug-rs-ffi\csharp\ButtplugCSharpFFI\bin\$(Platform)\$(Configuration)\net472;D:\Plattformen\Steam\steamapps\common\Beat Saber\IPA\Data\Managed;D:\Plattformen\Steam\steamapps\common\Beat Saber\IPA\Libs;D:\Plattformen\Steam\steamapps\common\Beat Saber\Libs" OutputFile="$(OutputPath)\$(AssemblyName).dll" />
+  </Target>
+
 </Project>
