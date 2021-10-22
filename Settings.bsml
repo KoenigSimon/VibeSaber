@@ -1,0 +1,14 @@
+﻿<settings-container>
+	<checkbox-setting text='Disable Vibration' value='DisableVibration' hover-hint='Disables the mod entirely' />
+	<increment-setting text='Vibration Time per Note' value='VibrationTimeperNote' increment='0.1' min='0' integer-only='false' hover-hint='Set how many seconds the device will vibrate' />
+	<checkbox-setting text='Stack Vibration Time' value='StackVibrationTime' hover-hint='Stacks the time on multiple triggers in a short amount of time' />
+	<checkbox-setting text='Scale Vibration with Energy' value='ScaleVibrationwithEnergy' hover-hint='Scales vibration intensity up based on missing energy' />
+	<increment-setting text='Fixed Mode Intensity' value='FixedModeIntensityPercentage' increment='5' min='0' max='100' integer-only='true' hover-hint='Vibration intensity in percent when energy scaling is off' />
+	<increment-setting text='Minimum Dynamic Intensity' value='MinDynamicIntensityPercentage' increment='5' min='0' max='100' integer-only='true' hover-hint='Minimum vibration intensity in percent when energy scaling is enabled' />
+	<increment-setting text='Maximum Dynamic Intensity' value='MaxDynamicIntensityPercentage' increment='5' min='0' max='100' integer-only='true' hover-hint='Maximum vibration intensity in percent when energy scaling is enabled' />
+	<checkbox-setting text='Vibrate on Missed Cut' value='VibrateonMissedCut' hover-hint='' />
+	<checkbox-setting text='Vibrate on Bad Cut' value='VibrateonBadCut' hover-hint='' />
+	<checkbox-setting text='Vibrate on Good Cut' value='VibrateonGoodCut' hover-hint='' />
+	<increment-setting text='Vibration Time on LevelFail' value='VibrationTimeonLevelFail' increment='0.1' min='0' integer-only='false' hover-hint='Vibration time in seconds when failing a level' />
+	<checkbox-setting text='Show Activity Overlay' value='ShowButtplugActivityOverlay' hover-hint='Shows an ingame overlay that displays when the plug is vibrating' />
+</settings-container>

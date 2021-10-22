@@ -94,7 +94,6 @@
     <Warning Text="Beat Saber is running, restart the game to use the latest build." Condition="'$(IsRunning)' == 'True'" />
   </Target>
 
-
   <!--Buttplug Things-->
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -116,7 +115,7 @@
       <InputAssemblies Include="lib\buttplug-rs-ffi\csharp\ButtplugCSharpFFI\bin\$(Configuration)\net472\System.Numerics.Vectors.dll" />
       <InputAssemblies Include="lib\buttplug-rs-ffi\csharp\ButtplugCSharpFFI\bin\$(Configuration)\net472\System.Runtime.CompilerServices.Unsafe.dll" />
     </ItemGroup>
-    <ILRepack Parallel="true" InputAssemblies="@(InputAssemblies)" TargetKind="Dll" LibraryPath="lib\;lib\buttplug-rs-ffi\csharp\ButtplugCSharpFFI\bin\$(Platform)\$(Configuration)\net472;D:\Plattformen\Steam\steamapps\common\Beat Saber\IPA\Data\Managed;D:\Plattformen\Steam\steamapps\common\Beat Saber\IPA\Libs;D:\Plattformen\Steam\steamapps\common\Beat Saber\Libs" OutputFile="$(OutputPath)\$(AssemblyName).dll" />
+    <ILRepack Parallel="true" InputAssemblies="@(InputAssemblies)" TargetKind="Dll" LibraryPath="lib\;lib\buttplug-rs-ffi\csharp\ButtplugCSharpFFI\bin\$(Platform)\$(Configuration)\net472;D:\Plattformen\Steam\steamapps\common\Beat Saber\IPA\Data\Managed;D:\Plattformen\Steam\steamapps\common\Beat Saber\IPA\Libs;D:\Plattformen\Steam\steamapps\common\Beat Saber\Libs;D:\Plattformen\Steam\steamapps\common\Beat Saber\Plugins" OutputFile="$(OutputPath)\$(AssemblyName).dll" />
   </Target>
 
 </Project>

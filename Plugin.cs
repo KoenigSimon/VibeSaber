@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 using IPALogger = IPA.Logging.Logger;
 using BS_Utils.Utilities;
 using IPA;
+using BeatSaberMarkupLanguage.Settings;
 
 namespace VibeSaber
 {
@@ -24,11 +25,12 @@ namespace VibeSaber
         /// [Init] methods that use a Constructor or called before regular methods like InitWithConfig.
         /// Only use [Init] with one Constructor.
         /// </summary>
-        public void Init(IPALogger logger)
+        public void Init(IPALogger logger, IPA.Config.Config conf)
         {
             Instance = this;
             Logger.log = logger;
-            Logger.log.Info("VibeSaber initialized.");
+            Logger.log.Info("Logger initialized.");
+            Config.Instance = conf.Generated<Config>();
 
             serverInstance = new ServerHandler();
             serverInstance.InitializeServer();
@@ -51,6 +53,8 @@ namespace VibeSaber
         {
             Logger.log.Debug("OnApplicationStart");
             new GameObject("VibeSaberController").AddComponent<VibeSaberController>();
+
+            BSMLSettings.instance.AddSettingsMenu("VibeSaber", "VibeSaber.Settings.bsml", Settings.instance);
 
             BSEvents.gameSceneActive += GameSceneActive;
         }

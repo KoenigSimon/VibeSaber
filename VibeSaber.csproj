@@ -45,6 +45,9 @@
       <Private>False</Private>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+    <Reference Include="BSML">
+      <HintPath>..\..\..\Plattformen\Steam\steamapps\common\Beat Saber\Plugins\BSML.dll</HintPath>
+    </Reference>
     <Reference Include="BS_Utils">
       <HintPath>$(BeatSaberDir)\Plugins\BS_Utils.dll</HintPath>
       <Private>False</Private>
@@ -126,9 +129,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Config.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Configuration\PluginConfig.cs" />
     <Compile Include="ServerHandler.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="VibeSaberController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -138,6 +143,7 @@
   <ItemGroup>
     <None Include="Directory.Build.props" Condition="Exists('Directory.Build.props')" />
     <None Include="Directory.Build.targets" Condition="Exists('Directory.Build.targets')" />
+    <EmbeddedResource Include="Settings.bsml" />
     <None Include="VibeSaber.csproj.user" Condition="Exists('VibeSaber.csproj.user')" />
   </ItemGroup>
   <ItemGroup>
