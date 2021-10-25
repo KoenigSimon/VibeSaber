@@ -57,6 +57,11 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>lib\buttplug-rs-ffi\csharp\ButtplugCSharpFFI\bin\Debug\net472\Buttplug.dll</HintPath>
     </Reference>
+    <Reference Include="GameplayCore">
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\GameplayCore.dll</HintPath>
+      <Private>False</Private>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
     <Reference Include="Google.Protobuf, Version=3.15.1.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>lib\buttplug-rs-ffi\csharp\ButtplugCSharpFFI\bin\Debug\net472\Google.Protobuf.dll</HintPath>

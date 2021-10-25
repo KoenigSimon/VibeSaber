@@ -24,11 +24,6 @@ namespace VibeSaber
 
         public void GetControllers()
         {
-            //intensity 0
-            Plugin.serverInstance.decayTime = 0;
-            Plugin.serverInstance.intensityStream = 0;
-            Plugin.serverInstance.ForceZeroIntensity();
-
             scoreController = Resources.FindObjectsOfTypeAll<ScoreController>().LastOrDefault();
             energyCounter = Resources.FindObjectsOfTypeAll<GameEnergyCounter>().LastOrDefault();
             endActions = Resources.FindObjectsOfTypeAll<StandardLevelGameplayManager>().LastOrDefault();
@@ -36,8 +31,9 @@ namespace VibeSaber
             if (scoreController != null && energyCounter != null && endActions != null)
             {
                 scoreController.noteWasMissedEvent += NoteMiss;
+                scoreController.noteWasCutEvent += NoteCut;
                 endActions.levelFinishedEvent += LevelFinished;
-                endActions.levelFailedEvent += LevelFinished;
+                endActions.levelFailedEvent += LevelFailed;
                 Logger.log.Info("Controller Events set successfully");
             }
             else
@@ -50,39 +46,45 @@ namespace VibeSaber
 
         private void NoteMiss(NoteData data, int score)
         {
+            if (energyCounter.noFail == false && Config.Instance.vibeOnMiss)
+                Plugin.serverInstance.SetVibration(energyCounter.energy);
+        }
 
-            if (energyCounter.noFail == false)
-            {
-                //intensity increase with lower energy
-                Plugin.serverInstance.decayTime = 0.3f;
-                Plugin.serverInstance.intensityStream = (1f - energyCounter.energy);
-            }
-            else
-            {
-                //intensity 0
-                Plugin.serverInstance.decayTime = 0;
-                Plugin.serverInstance.intensityStream = 0;
-            }
+        private void NoteCut(NoteData data, in NoteCutInfo info, int multiplier)
+        {
+            //if swingratingcounter object is zero, it was a bad cut
+            if(Config.Instance.vibeOnBadCut && info.swingRatingCounter == null)
+                Plugin.serverInstance.SetVibration(energyCounter.energy);
+
+            //otherwise good cut
+            if (Config.Instance.vibeOnGoodCut && info.swingRatingCounter == null)
+                Plugin.serverInstance.SetVibration(energyCounter.energy);
+        }
+
+        private void LevelFailed()
+        {
+            LevelOver(true);
         }
 
         private void LevelFinished()
         {
-            //intensity 0
-            Plugin.serverInstance.decayTime = 0;
-            Plugin.serverInstance.intensityStream = 0;
-            Plugin.serverInstance.ForceZeroIntensity();
+            LevelOver(false);
+        }
 
+        private void LevelOver(bool failed)
+        {
             Logger.log.Info("Level Ended");
-            if (scoreController != null && energyCounter != null && endActions != null)
+            Plugin.serverInstance.LevelOver(failed);
+            if (scoreController != null)
             {
                 scoreController.noteWasMissedEvent -= NoteMiss;
-                endActions.levelFinishedEvent -= LevelFinished;
-                endActions.levelFailedEvent -= LevelFinished;
-                Plugin.serverInstance.ForceZeroIntensity();
+                scoreController.noteWasCutEvent -= NoteCut;
             }
-            Plugin.serverInstance.ForceZeroIntensity();
-            Plugin.serverInstance.ForceZeroIntensity();
-            Plugin.serverInstance.ForceZeroIntensity();
+            if (endActions != null)
+            {
+                endActions.levelFinishedEvent -= LevelFinished;
+                endActions.levelFailedEvent -= LevelFailed;
+            }            
         }
 
         // These methods are automatically called by Unity, you should remove any you aren't using.
@@ -118,7 +120,7 @@ namespace VibeSaber
         private void Update()
         {
             if (Plugin.serverInstance != null)
-                Plugin.serverInstance.OnServerUpdate();
+                Plugin.serverInstance.OnFrameServerUpdate();
         }
 
         /// <summary>
@@ -153,7 +155,6 @@ namespace VibeSaber
             Logger.log?.Debug($"{name}: OnDestroy()");
             if (Instance == this)
                 Instance = null; // This MonoBehaviour is being destroyed, so set the static instance property to null.
-
         }
         #endregion
     }
