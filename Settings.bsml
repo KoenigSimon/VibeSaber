@@ -11,4 +11,5 @@
 	<checkbox-setting text='Vibrate on Good Cut' value='VibrateonGoodCut' hover-hint='' />
 	<increment-setting text='Vibration Time on LevelFail' value='VibrationTimeonLevelFail' increment='0.1' min='0' integer-only='false' hover-hint='Vibration time in seconds when failing a level' />
 	<checkbox-setting text='Show Activity Overlay' value='ShowButtplugActivityOverlay' hover-hint='Shows an ingame overlay that displays when the plug is vibrating' />
+  <!--increment-setting text='Buttplug Updates per Second' value='ServerUpdatesPerSecond' increment='1' min='1' max='30' integer-only='true' hover-hint='Maximum messages sent to the buttplug per second' /-->
 </settings-container>

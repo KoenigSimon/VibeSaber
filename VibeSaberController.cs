@@ -47,18 +47,18 @@ namespace VibeSaber
         private void NoteMiss(NoteData data, int score)
         {
             if (energyCounter.noFail == false && Config.Instance.vibeOnMiss)
-                Plugin.serverInstance.SetVibration(energyCounter.energy);
+                Plugin.Instance.SetVibration(energyCounter.energy);
         }
 
         private void NoteCut(NoteData data, in NoteCutInfo info, int multiplier)
         {
             //if swingratingcounter object is zero, it was a bad cut
             if(Config.Instance.vibeOnBadCut && info.swingRatingCounter == null)
-                Plugin.serverInstance.SetVibration(energyCounter.energy);
+                Plugin.Instance.SetVibration(energyCounter.energy);
 
             //otherwise good cut
             if (Config.Instance.vibeOnGoodCut && info.swingRatingCounter == null)
-                Plugin.serverInstance.SetVibration(energyCounter.energy);
+                Plugin.Instance.SetVibration(energyCounter.energy);
         }
 
         private void LevelFailed()
@@ -74,7 +74,8 @@ namespace VibeSaber
         private void LevelOver(bool failed)
         {
             Logger.log.Info("Level Ended");
-            Plugin.serverInstance.LevelOver(failed);
+            Plugin.Instance.LevelOver(failed);
+
             if (scoreController != null)
             {
                 scoreController.noteWasMissedEvent -= NoteMiss;
@@ -119,8 +120,8 @@ namespace VibeSaber
         /// </summary>
         private void Update()
         {
-            if (Plugin.serverInstance != null)
-                Plugin.serverInstance.OnFrameServerUpdate();
+            if (Plugin.Instance != null)
+                Plugin.Instance.UpdateServer();
         }
 
         /// <summary>

@@ -45,6 +45,9 @@ namespace VibeSaber
         [UIValue("ShowButtplugActivityOverlay")]
         public bool showActivityOverlay = Config.Instance.showActivityOverlay;
 
+        [UIValue("ServerUpdatesPerSecond")]
+        public int maxServerUpdatedPerSecond = Config.Instance.maxServerUpdatedPerSecond;
+
 
         [UIAction("#apply")]
         public void OnApply()
@@ -61,6 +64,7 @@ namespace VibeSaber
             Config.Instance.vibeOnGoodCut = vibeOnGoodCut;
             Config.Instance.showActivityOverlay = showActivityOverlay;
             Config.Instance.vibeTimeOnFail = vibeTimeOnFail;
+            Config.Instance.maxServerUpdatedPerSecond = maxServerUpdatedPerSecond;
         }
 
 

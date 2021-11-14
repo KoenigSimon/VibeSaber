@@ -20,6 +20,7 @@ namespace VibeSaber
         public virtual float vibeTimeOnFail { get; set; } = 0;
         public virtual bool showActivityOverlay { get; set; } = false;
         public virtual bool disable { get; set; } = false;
+        public virtual int maxServerUpdatedPerSecond { get; set; } = 10;
 
 
         /// <summary>

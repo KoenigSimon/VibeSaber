@@ -57,6 +57,52 @@ namespace VibeSaber
             BSMLSettings.instance.AddSettingsMenu("VibeSaber", "VibeSaber.Settings.bsml", Settings.instance);
 
             BSEvents.gameSceneActive += GameSceneActive;
+            SceneManager.activeSceneChanged += ActiveSceneChanged;
+        }        
+
+        [OnExit]
+        public void OnApplicationQuit()
+        {
+            Logger.log.Debug("OnApplicationQuit");
+            serverInstance.StopServer();
+            BSEvents.gameSceneActive -= GameSceneActive;
+            SceneManager.activeSceneChanged -= ActiveSceneChanged;
+        }
+
+        public void SetVibration(float energy)
+        {
+            Logger.log.Info("Vibration Set called");
+
+            if (Config.Instance.scaleWithEnergy)
+                serverInstance.intensity = 1f - energy;
+            else
+                serverInstance.intensity = Config.Instance.fixedIntensity;
+
+            if (Config.Instance.stackVibeTime)
+                serverInstance.decayTime += Config.Instance.vibeTime;
+            else
+                serverInstance.decayTime = Config.Instance.vibeTime;
+        }
+
+        public void LevelOver(bool failed)
+        {
+            if (failed)
+            {
+                if(Config.Instance.vibeTimeOnFail > 0f)
+                    _ = serverInstance.SendDelayedIntensity(0f, Mathf.FloorToInt(Config.Instance.vibeTimeOnFail * 1000f));
+                else
+                    _ = serverInstance.SendDelayedIntensity(0f, 100);
+            }
+            else
+            {
+                //serverInstance.SendChangedVibrationIntensity(0f);
+                _ = serverInstance.SendDelayedIntensity(0f, 100);
+            }
+        }
+
+        public void UpdateServer()
+        {
+            serverInstance.OnFrameServerUpdate();
         }
 
         void GameSceneActive()
@@ -65,12 +111,14 @@ namespace VibeSaber
             Logger.log.Info("Controllers initialized");
         }
 
-        [OnExit]
-        public void OnApplicationQuit()
+        void ActiveSceneChanged(Scene oldScene, Scene newScene)
         {
-            Logger.log.Debug("OnApplicationQuit");
-            BSEvents.gameSceneActive -= GameSceneActive;
-            serverInstance.StopServer();
+            if (newScene.name == "MainMenu")
+            {
+                Logger.log.Info("Main Menu Loaded");
+                //serverInstance.SendChangedVibrationIntensity(0f);
+                //serverInstance.SendStopDeviceCommand();
+            }
         }
     }
     internal static class Logger

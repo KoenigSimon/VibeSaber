@@ -75,8 +75,9 @@ namespace VibeSaber
         private float mScanDuration = 15f;
         private float mScanWaitDuration = 5f;
 
+        bool levelActive = false;
         public float decayTime = 0f;
-        private float intensity = 0f;
+        public float intensity = 0f;
 
         Mutex mDeviceMutex = new Mutex();
         Dictionary<uint, ButtplugClientDevice> mDevicesAdded = new Dictionary<uint, ButtplugClientDevice>();
@@ -93,36 +94,6 @@ namespace VibeSaber
             // Load Buttplug native library from resources
             NativeMethods.LoadUnmanagedLibraryFromResource(Assembly.GetExecutingAssembly(), "VibeSaber.lib.buttplug_rs_ffi.csharp.ButtplugCSharpFFI.bin.Debug.net472.buttplug_rs_ffi.dll", "buttplug_rs_ffi.dll");
 
-        }
-
-        public void SetVibration(float energy)
-        {
-            if(Config.Instance.scaleWithEnergy)
-                intensity = 1f - energy;
-            else
-                intensity = Config.Instance.fixedIntensity;
-
-            if(Config.Instance.stackVibeTime)
-                decayTime += Config.Instance.vibeTime;
-            else
-                decayTime = Config.Instance.vibeTime;
-        }
-
-        public void LevelOver(bool failed)
-        {
-            if (failed)
-            {
-                decayTime = Config.Instance.vibeTimeOnFail;
-                //TODO: add fail intensity parameter to settings
-                if(decayTime > 0)
-                    SendVibrationIntensity(0.5f);
-                else
-                    SendVibrationIntensity(0f);
-            }
-            else
-            {
-                SendVibrationIntensity(0f);
-            }
         }
 
         public void OnFrameServerUpdate()
@@ -156,25 +127,21 @@ namespace VibeSaber
             if(decayTime > 0)
             {
                 decayTime -= Time.deltaTime;
-
-                SendVibrationIntensity(intensity);
+                SendChangedVibrationIntensity(intensity);
             }
             else
             {
-                SendVibrationIntensity(0);
+                SendChangedVibrationIntensity(0);
             }
         }
 
         public void SendStopDeviceCommand()
         {
             foreach (var device in mButtplug.Devices)
-            {
-                //dont VIBRATE!!!
                 _ = device.SendStopDeviceCmd();
-            }
         }
 
-        private void SendVibrationIntensity(float intensity)
+        public void SendChangedVibrationIntensity(float intensity)
         {
             //set all devices to same intensity (for spectators i guess)
             var deviceIntensities = new Dictionary<uint, float?[]>();
@@ -205,6 +172,44 @@ namespace VibeSaber
                     mDeviceIntensities[device.Index] = motorIntensityValues;
                     Logger.log.Info($"Sending command with intensity: {intensity}");
                 }
+            }
+        }
+
+        public async Task SendDelayedIntensity(float intesity, int delayInMS)
+        {
+            await Task.Delay(delayInMS);
+
+            ForceSendVibrationIntensity(intensity);
+        }
+
+        private void ForceSendVibrationIntensity(float intensity)
+        {
+            //set all devices to same intensity (for spectators i guess)
+            var deviceIntensities = new Dictionary<uint, float?[]>();
+            foreach (var device in mButtplug.Devices)
+            {
+                if (!device.AllowedMessages.ContainsKey(Buttplug.ServerMessage.Types.MessageAttributeType.VibrateCmd)) continue;
+                uint motorCount = device.AllowedMessages[Buttplug.ServerMessage.Types.MessageAttributeType.VibrateCmd].FeatureCount;
+                deviceIntensities[device.Index] = new float?[motorCount];
+
+                var motorIntensities = deviceIntensities[device.Index];
+                for (int i = 0; i < motorIntensities.Length; i++)
+                {
+                    deviceIntensities[device.Index][i] = intensity;
+                }
+            }
+
+            // Send device commands
+            foreach (var device in mButtplug.Devices)
+            {
+                if (!deviceIntensities.ContainsKey(device.Index)) continue;
+
+                // Refrain from updating with the same values, since this seems to increase the chance of device hangs
+                var motorIntensityValues = Array.ConvertAll(deviceIntensities[device.Index], i => i ?? 0);
+                // VIBRATE!!!
+                _ = device.SendVibrateCmd(Array.ConvertAll(motorIntensityValues, i => (double)i));
+                mDeviceIntensities[device.Index] = motorIntensityValues;
+                Logger.log.Info($"Sending command with intensity: {intensity}");
             }
         }
 
@@ -412,10 +417,10 @@ namespace VibeSaber
 
         void OnDeviceRemoved(object buttplug, Buttplug.DeviceRemovedEventArgs e)
         {
-            mDeviceMutex.WaitOne();
+            //mDeviceMutex.WaitOne();
             mDevicesAdded.Remove(e.Device.Index);
             mDevicesRemoved[e.Device.Index] = e.Device;
-            mDeviceMutex.ReleaseMutex();
+            //mDeviceMutex.ReleaseMutex();
         }
 
         void OnButtplugDisconnect(object buttplug, EventArgs e)
@@ -428,10 +433,18 @@ namespace VibeSaber
             mDeviceMutex.ReleaseMutex();
         }
 
-        public void StopServer()
+        public async void StopServer()
         {
-            SendStopDeviceCommand();
-            _ = mButtplug?.DisconnectAsync();
+            if (mButtplug.Connected)
+            {
+                await mButtplug.DisconnectAsync();
+            }
+
+            Logger.log.Info("Disconnected from Server");
+
+            mIntifaceServer.Kill();
+
+            Logger.log.Info("Killed intiface server");
         }
     }
 }
