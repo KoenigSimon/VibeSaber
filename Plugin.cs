@@ -64,6 +64,7 @@ namespace VibeSaber
         public void OnApplicationQuit()
         {
             Logger.log.Debug("OnApplicationQuit");
+            DestroyController();
             serverInstance.StopServer();
             BSEvents.gameSceneActive -= GameSceneActive;
             SceneManager.activeSceneChanged -= ActiveSceneChanged;
@@ -109,6 +110,11 @@ namespace VibeSaber
         {
             VibeSaberController.Instance.GetControllers();
             Logger.log.Info("Controllers initialized");
+        }
+
+        void DestroyController()
+        {
+            UnityEngine.Object.Destroy(VibeSaberController.Instance.gameObject);
         }
 
         void ActiveSceneChanged(Scene oldScene, Scene newScene)

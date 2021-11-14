@@ -417,10 +417,10 @@ namespace VibeSaber
 
         void OnDeviceRemoved(object buttplug, Buttplug.DeviceRemovedEventArgs e)
         {
-            //mDeviceMutex.WaitOne();
+            mDeviceMutex.WaitOne();
             mDevicesAdded.Remove(e.Device.Index);
             mDevicesRemoved[e.Device.Index] = e.Device;
-            //mDeviceMutex.ReleaseMutex();
+            mDeviceMutex.ReleaseMutex();
         }
 
         void OnButtplugDisconnect(object buttplug, EventArgs e)
@@ -433,18 +433,11 @@ namespace VibeSaber
             mDeviceMutex.ReleaseMutex();
         }
 
-        public async void StopServer()
+        public void StopServer()
         {
-            if (mButtplug.Connected)
-            {
-                await mButtplug.DisconnectAsync();
-            }
+            //_ = mButtplug.DisconnectAsync();
+            //_ = mButtplug.StopScanningAsync();
 
-            Logger.log.Info("Disconnected from Server");
-
-            mIntifaceServer.Kill();
-
-            Logger.log.Info("Killed intiface server");
         }
     }
 }
