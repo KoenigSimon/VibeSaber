@@ -64,7 +64,6 @@ namespace VibeSaber
         public void OnApplicationQuit()
         {
             Logger.log.Debug("OnApplicationQuit");
-            DestroyController();
             serverInstance.StopServer();
             BSEvents.gameSceneActive -= GameSceneActive;
             SceneManager.activeSceneChanged -= ActiveSceneChanged;
